@@ -4,16 +4,23 @@ using UnityEngine;
 
 public class PlayerControls : Character 
 {
+	public float gravityScale;
+	void Start ()
+	{
+		gravityScale = gameObject.GetComponent<Rigidbody2D> ().gravityScale;
+	}
+
 	// Update is called once per frame
 	public override void Update () 
 	{
+
 		base.Update ();
 
 		if (Input.GetKey ("w")) 
 		{
 			if (grounded) 
 			{
-				Jump (0.0f, 5);
+				Jump (0.0f, jumpSpeed);
 			}
 		}
 
@@ -27,11 +34,11 @@ public class PlayerControls : Character
 		{
 			if (grounded) 
 			{
-				acc.x = acc.x - grdMve;
+				acc.x = -grdMve;
 			} 
 			else 
 			{
-				acc.x = acc.x - airMve;
+				acc.x = -airMve;
 			}
 		}
 
@@ -39,30 +46,55 @@ public class PlayerControls : Character
 		{
 			if (grounded) 
 			{
-				acc.x = acc.x + grdMve;
+				acc.x = grdMve;
 			} 
 			else 
 			{
-				acc.x = acc.x + airMve;
+				acc.x = airMve;
 			}
 		}
 
+		if (!grounded) 
+		{
 
-		vel = vel + acc;
+			gameObject.GetComponent<Rigidbody2D> ().gravityScale = gravityScale
+				+ gameObject.GetComponent<Rigidbody2D> ().gravityScale;
+		}
+
+		gameObject.GetComponent<Rigidbody2D> ().velocity = vel + acc;
 
 		gameObject.transform.Translate (vel);
 
-		vel.x = vel.x * slippery;
+
+
+		vel = vel * slippery;
 
 		if (vel.x < 0.1f) 
 		{
 			StopCharacter (0);
 		}
 
-		if (vel.y < 0.1f) 
+		if (grounded) 
 		{
 			StopCharacter (1);
 		}
-		acc = new Vector2();
+	}
+
+	void OnCollisionStay2D (Collision2D col)
+	{
+		gameObject.GetComponent<Rigidbody2D> ().gravityScale = 
+			gravityScale;
+		if (col.gameObject.tag == "ground") 
+		{
+			grounded = true;
+		}
+	}
+
+	void OnCollisionExit2D(Collision2D col)
+	{
+		if (col.gameObject.tag == "ground") 
+		{
+			grounded = false;
+		}
 	}
 }

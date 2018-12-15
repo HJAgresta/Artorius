@@ -16,16 +16,13 @@ public class Character : MonoBehaviour {
 
 	protected void Jump(float delay, float upVelocity)
 	{
-		acc.y = acc.y + upVelocity;
+		acc.y = upVelocity;
 	}
 
 	public virtual void Update()
 	{
 
-		if (!grounded) 
-		{
-			acc.y = acc.y - fallAcc;
-		}
+		acc = new Vector2 ();
 	}
 
 	/// <summary>
